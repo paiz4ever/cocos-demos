@@ -1,5 +1,5 @@
 import { _decorator, Component, EditBox, Label, Node } from "cc";
-import { defineStore } from "../core/responsive-data/zustand-wrap/main";
+import { defineStore } from "../core/responsive-data/zustand-wrap/store";
 const { ccclass, property } = _decorator;
 
 export const store = defineStore<{
@@ -18,7 +18,9 @@ export const store = defineStore<{
     set((state) => ({
       count: state.count + 1,
     }));
-    set((state) => (state.count = 1));
+    set((state) => {
+      state.count = 1;
+    });
   },
   addDataCount: () => {
     set((state) => ({
@@ -38,7 +40,7 @@ export class Test extends Component {
   @property(Label)
   countLabel: Label;
 
-  @store.input((state) => state.data.text1)
+  @store.text((state) => state.data.text1)
   @property(EditBox)
   editBox: EditBox;
 

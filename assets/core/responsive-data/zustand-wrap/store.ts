@@ -24,6 +24,10 @@ export function defineStore<T = {}>(creator: StateCreator<T>) {
     WithSelectorSubscribe<StoreApi<T>>;
 }
 
+function warn(...arg) {
+  console.warn("[Store]", ...arg);
+}
+
 function match(o: any, ...arg: any) {
   const isNode = o instanceof Node;
   for (let st of arg) {
@@ -91,7 +95,6 @@ function immer(config) {
   return (set, get, api) =>
     config(
       (partial, replace) => {
-        console.log(typeof partial === "function", partial);
         const nextState =
           typeof partial === "function" ? produce(partial) : partial;
         return set(nextState, replace);
@@ -108,7 +111,7 @@ class StoreWrapper<T = {}> {
     });
     Object.keys(store.getState()).forEach((key) => {
       if (key in this) {
-        console.warn(
+        warn(
           `conflict key in store: ${key}, you can only read it by 【store.getState().${key}】`
         );
         return;
@@ -117,15 +120,42 @@ class StoreWrapper<T = {}> {
         get() {
           return store.getState()[key];
         },
+        set(value) {
+          warn(
+            `you can only set store state by【store.setState({ ${key}: ${value} })】or【store.setState((state) => { state.${key} = ${value} })】`
+          );
+        },
       });
     });
   }
 
+  /**
+   * 绑定文本组件（Label，RichText，EditBox）
+   * @param selector 状态选择器
+   * @description
+   * - 使用该装饰器绑定后，不应该使用`[组件.string]`的方法改变文本。使用`[store.setState]`
+   * - `EditBox`支持双向数据绑定
+   * @example
+   * ```ts
+   * const store = defineStore({
+   *   count: 0,
+   * })
+   *
+   * class Test extends Component {
+   *   `@store.text("count")`
+   *   `@property(Label)`
+   *   label: Label
+   * }
+   * ```
+   */
   text(
     selector:
       | (
           | ExtractTargetKey<number | string, T>
           | `${ExtractTargetKey<object, T>}.${string}`
+          | `${string}\${${
+              | ExtractTargetKey<number | string, T>
+              | `${ExtractTargetKey<object, T>}.${string}`}}${string}`
         )
       | ((state: T) => number | string)
   ) {
@@ -135,75 +165,32 @@ class StoreWrapper<T = {}> {
       let unsub: () => void;
       target.onLoad = function () {
         if (!this[name]) return;
-        let c = match(this[name], Label, RichText);
+        let c = match(this[name], Label, RichText, EditBox);
         if (!c) {
-          console.warn("text decorator only support Label/RichText");
+          warn("text decorator only support Label/RichText/EditBox");
           return;
         }
-        const { onEnable, onDisable } = c;
-        c.onEnable = function () {
-          unsub = that.store.subscribe(
-            selector2fn(selector),
-            (selectedState) => {
-              c.string = String(selectedState);
-            },
-            {
-              fireImmediately: true,
-            }
-          );
-          onEnable?.call(this);
-        };
-        c.onDisable = function () {
-          unsub?.();
-          unsub = null;
-          onDisable?.call(this);
-        };
-        onLoad?.call(this);
-      };
-    };
-  }
-
-  input(
-    selector:
-      | ExtractTargetKey<string, T>
-      | `${ExtractTargetKey<object, T>}.${string}`
-      | ((state: T) => string)
-  ) {
-    return (target, name) => {
-      const { onLoad } = target;
-      const that = this;
-      let unsub: () => void;
-      target.onLoad = function () {
-        if (!this[name]) return;
-        let c = match(this[name], EditBox) as EditBox;
-        if (!c) {
-          console.warn("text decorator only support EditBox");
-          return;
-        }
-        let isEqual = true;
-        c.node.on(EditBox.EventType.TEXT_CHANGED, (editBox: EditBox) => {
-          isEqual = false;
-          that.store.setState((state) => {
-            setStringObject(
-              state,
-              selector2attr(selector, state),
-              editBox.string
-            );
+        // 双向绑定
+        if (c instanceof EditBox) {
+          c.node.on(EditBox.EventType.TEXT_CHANGED, (editBox: EditBox) => {
+            that.store.setState((state) => {
+              setStringObject(
+                state,
+                selector2attr(selector, state),
+                editBox.string
+              );
+            });
           });
-        });
+        }
         const { onEnable, onDisable } = c;
         c.onEnable = function () {
           unsub = that.store.subscribe(
             selector2fn(selector),
             (selectedState) => {
               c.string = String(selectedState);
-              isEqual = true;
             },
             {
               fireImmediately: true,
-              equalityFn() {
-                return isEqual;
-              },
             }
           );
           onEnable?.call(this);

@@ -41,10 +41,10 @@ type StoreSubscribeWithSelector<T> = {
         | T
         | Partial<T>
         | {
-            _(state: T): void;
+            _(state: T): T | Partial<T> | void;
           }["_"],
       replace?: boolean | undefined
-    ): T | Partial<T> | void;
+    ): void;
   }["_"];
 };
 
