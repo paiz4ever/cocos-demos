@@ -347,10 +347,7 @@
       "__uuid__": "d58adadd-e2c9-448d-8fd4-b76357139565",
       "__expectedType__": "cc.ParticleAsset"
     },
-    "_spriteFrame": {
-      "__uuid__": "90d83813-e4d3-4775-9bfc-673b5ea6d273@f9941",
-      "__expectedType__": "cc.SpriteFrame"
-    },
+    "_spriteFrame": null,
     "_totalParticles": 100,
     "_startColor": {
       "__type__": "cc.Color",
