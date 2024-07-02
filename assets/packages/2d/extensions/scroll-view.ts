@@ -23,7 +23,7 @@ ScrollView.prototype.scrollToItem = function (
     warn(`index ${index} is invalid`);
     return;
   }
-  let nodeUITransform = node.getComponent(UITransform);
+  const nodeUITransform = node.getComponent(UITransform);
   const viewUITransform = ts.content.parent.getComponent(UITransform);
   ts.scrollToOffset(
     v2(
