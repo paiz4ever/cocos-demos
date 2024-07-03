@@ -12,17 +12,17 @@ const { ccclass, property } = _decorator;
 @ccclass("RankPromotion")
 export class RankPromotion extends Component {
   @property({ type: CCInteger, tooltip: "起点序号" })
-  fromIndex: number;
+  declare fromIndex: number;
   @property({ type: CCInteger, tooltip: "终点序号" })
-  toIndex: number;
+  declare toIndex: number;
 
-  private scrollView: ScrollView;
+  private declare scrollView: ScrollView;
 
   protected onLoad(): void {
-    this.scrollView = this.getComponent(ScrollView);
-    this.scrollView.content.children[this.fromIndex].children[0].getComponent(
+    this.scrollView = this.getComponent(ScrollView)!;
+    this.scrollView.content!.children[this.fromIndex].children[0].getComponent(
       Sprite
-    ).color = Color.GREEN;
+    )!.color = Color.GREEN;
     playRankPromotion({
       sv: this.scrollView,
       fromIndex: this.fromIndex,

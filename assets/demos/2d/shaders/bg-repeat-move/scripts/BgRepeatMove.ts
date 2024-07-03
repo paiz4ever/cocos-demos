@@ -7,15 +7,15 @@ export default class BgRepeatMove extends Component {
   speed: number = 1;
 
   private time = 0;
-  private mtl: Material;
+  private declare mtl: Material;
 
   start() {
     this.time = 0;
-    this.mtl = this.getComponent(Sprite).getMaterialInstance(0);
+    this.mtl = this.getComponent(Sprite)!.getMaterialInstance(0)!;
     this.mtl.setProperty("speed", this.speed);
   }
 
-  update(dt) {
+  protected update(dt: number): void {
     this.time += dt;
     this.mtl.setProperty("time", this.time);
   }
