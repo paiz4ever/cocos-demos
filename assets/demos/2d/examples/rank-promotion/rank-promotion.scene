@@ -3001,8 +3001,8 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "fromIndex": 9,
-    "toIndex": 0,
+    "fromIndex": 0,
+    "toIndex": 9,
     "_id": "2eVfe2l49BJoml9jgl298v"
   },
   {
@@ -5981,8 +5981,8 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "fromIndex": 8,
-    "toIndex": 2,
+    "fromIndex": 2,
+    "toIndex": 10,
     "_id": "31XErE7Z5Bf7H8rNrF6rPh"
   },
   {

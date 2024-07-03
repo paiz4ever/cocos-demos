@@ -4,10 +4,10 @@ import { ScrollView, UITransform, v2, warn } from "cc";
 function pretreat(sv: ScrollView) {
   if (sv.touchScrollLock) {
     // @ts-ignore
-    sv._unregisterEvent();
+    sv?._unregisterEvent();
     sv.node.once(ScrollView.EventType.SCROLL_ENDED, () => {
       // @ts-ignore
-      sv._registerEvent();
+      sv?._registerEvent();
     });
   }
 }
